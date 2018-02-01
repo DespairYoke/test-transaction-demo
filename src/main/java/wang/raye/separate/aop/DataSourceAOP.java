@@ -15,21 +15,19 @@ import wang.raye.separate.config.DynamicDataSource;
 @Slf4j
 public class DataSourceAOP {
 
-    @Before("execution(* wang.raye.separate.service..*.select*(..)) || execution(* wang.raye.separate.service..*.get*(..))")
-    public void setReadDataSourceType() {
-        DynamicDataSource.slave();
-        log.info("dataSource切换到：slave");
-    }
-
-    @Before("execution(* wang.raye.separate.service..*.insert*(..)) || execution(* wang.raye.separate.service..*.update*(..)) || execution(* wang.raye.separate.service..*.delete*(..)) || execution(* wang.raye.separate.service..*.add*(..))")
+    @Before("(@annotation(wang.raye.separate.annotation.Master) || execution(* wang.raye.separate.service..*.insert*(..)) || " +
+            "execution(* wang.raye.separate.service..*.update*(..)) || execution(* wang.raye.separate.service..*.delete*(..)) || " +
+            "execution(* wang.raye.separate.service..*.add*(..))) && !@annotation(wang.raye.separate.annotation.Slave)")
     public void setWriteDataSourceType() {
         DynamicDataSource.master();
         log.info("dataSource切换到：master");
     }
 
-    @Before(("execution(* org.springframework.jdbc.datasource.DataSourceTransactionManager.getDataSource*(..))"))
-    public void setTransaction(){
-        DynamicDataSource.master();
-        log.info("事物 dataSource切换到：master");
+    @Before("(@annotation(wang.raye.separate.annotation.Slave) || execution(* wang.raye.separate.service..*.select*(..)) || execution(* wang.raye.separate.service..*.get*(..))) && !@annotation(wang.raye.separate.annotation.Master)")
+    public void setReadDataSourceType() {
+        DynamicDataSource.slave();
+        log.info("dataSource切换到：slave");
     }
+
+
 }
