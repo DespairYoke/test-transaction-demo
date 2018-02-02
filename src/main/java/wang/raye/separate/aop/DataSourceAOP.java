@@ -17,7 +17,7 @@ public class DataSourceAOP {
 
     @Before("(@annotation(wang.raye.separate.annotation.Master) || execution(* wang.raye.separate.service..*.insert*(..)) || " +
             "execution(* wang.raye.separate.service..*.update*(..)) || execution(* wang.raye.separate.service..*.delete*(..)) || " +
-            "execution(* wang.raye.separate.service..*.add*(..))) && !@annotation(wang.raye.separate.annotation.Slave)")
+            "execution(* wang.raye.separate.service..*.add*(..))) && !@annotation(wang.raye.separate.annotation.Slave) -")
     public void setWriteDataSourceType() {
         DynamicDataSource.master();
         log.info("dataSource切换到：master");
